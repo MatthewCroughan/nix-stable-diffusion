@@ -40,6 +40,9 @@
         transformers
         kornia
         k-diffusion
+        picklescan
+        diffusers
+        pypatchmatch
 
         # following packages not needed for vanilla SD but used by both UIs
         realesrgan
@@ -135,6 +138,9 @@
           lpips = callPackage ./packages/lpips { };
           ffmpy = callPackage ./packages/ffmpy { };
           shap = callPackage ./packages/shap { };
+          picklescan = callPackage ./packages/picklescan { };
+          diffusers = callPackage ./packages/diffusers { };
+          pypatchmatch = callPackage ./packages/pypatchmatch { };
           fonts = callPackage ./packages/fonts { };
           font-roboto = callPackage ./packages/font-roboto { };
           analytics-python = callPackage ./packages/analytics-python { };
@@ -179,6 +185,15 @@
         {
           torch = pythonPackages.torch-bin;
           torchvision = pythonPackages.torchvision-bin;
+          huggingface-hub = pythonPackages.huggingface-hub.overrideAttrs(_: {
+            src = nixpkgs.fetchFromGitHub {
+              owner = "huggingface";
+              repo = "huggingface_hub";
+              rev = "refs/tags/v0.11.0";
+              hash = "sha256-d+X4hGt4K6xmRFw8mevKpZ6RDv+U1PJ8WbmdKGDbVNs=";
+              };
+          });
+          opencv4 = pythonPackages.opencv4.override { openblas = nixpkgs.blas; };
         };
     in
     {
@@ -212,6 +227,7 @@
               let
                 shellHook = ''
                   cd InvokeAI
+                  export PYTHONPATH=$PWD:$PYTHONPATH
                 '';
               in
               {
