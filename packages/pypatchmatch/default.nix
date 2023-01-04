@@ -15,7 +15,6 @@
 , pandas
 , transformers
 , opencv4
-, opencv3
 , lightgbm
 , catboost
 , pyspark
@@ -34,15 +33,23 @@
 , regex
 , importlib-metadata
 , huggingface-hub
+, symlinkJoin
 }:
 
 let
+  opencv4Fixed = symlinkJoin {
+    name = "opencv4Fixed";
+    paths = [ opencv4 ];
+    postBuild = ''
+      cp -r $out/lib/pkgconfig/opencv4.pc $out/lib/pkgconfig/opencv.pc
+    '';
+  };
   libpatchmatch = stdenv.mkDerivation {
     name = "libpatchmatch";
     sourceRoot = ["source/patchmatch"];
     nativeBuildInputs = [
       pkg-config
-      opencv3
+      opencv4Fixed
     ];
     src = fetchzip {
       url = "https://github.com/invoke-ai/PyPatchMatch/archive/129863937a8ab37f6bbcec327c994c0f932abdbc.zip";
