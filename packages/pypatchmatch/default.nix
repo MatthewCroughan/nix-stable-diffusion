@@ -37,6 +37,7 @@
 }:
 
 let
+  # https://github.com/invoke-ai/InvokeAI/blob/34f8117241dc961e78929bda30ce3b4f19e707cf/docs/installation/060_INSTALL_PATCHMATCH.md
   opencv4Fixed = symlinkJoin {
     name = "opencv4Fixed";
     paths = [ opencv4 ];
@@ -61,7 +62,7 @@ let
       cp libpatchmatch.so $out/lib/
     '';
   };
-in buildPythonPackage rec {
+in buildPythonPackage {
   pname = "pypatchmatch";
   version = "129863937a8ab37f6bbcec327c994c0f932abdbc";
 
@@ -84,7 +85,7 @@ in buildPythonPackage rec {
     cp ${libpatchmatch}/lib/libpatchmatch.so $out/lib/*/site-packages/patchmatch/
   '';
 
-  meta = with lib; {
+  meta = {
     description = "This library implements the PatchMatch based inpainting algorithm.";
     homepage = "https://github.com/invoke-ai/PyPatchMatch";
   };
