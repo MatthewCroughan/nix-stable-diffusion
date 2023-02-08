@@ -4,7 +4,7 @@
   inputs = {
     nixlib.url = "github:nix-community/nixpkgs.lib";
     nixpkgs = {
-      url = "github:NixOS/nixpkgs?rev=fd54651f5ffb4a36e8463e0c327a78442b26cbe7";
+      url = "github:NixOS/nixpkgs/nixos-unstable"; # ?rev=fd54651f5ffb4a36e8463e0c327a78442b26cbe7";
     };
     stable-diffusion-repo = {
       url = "github:CompVis/stable-diffusion?rev=69ae4b35e0a0f6ee1af8bb9a5d0016ccb27e36dc";
@@ -93,10 +93,10 @@
             nativeBuildInputs = old.nativeBuildInputs ++ [ nixpkgs.python3Packages.pythonRelaxDepsHook ];
             pythonRelaxDeps = [ "protobuf" ];
           });
-          streamlit = nixpkgs.streamlit.overrideAttrs (old: {
-            nativeBuildInputs = old.nativeBuildInputs ++ [ nixpkgs.python3Packages.pythonRelaxDepsHook ];
-            pythonRelaxDeps = [ "protobuf" ];
-          });
+          # streamlit = nixpkgs.streamlit.overrideAttrs (old: {
+            # nativeBuildInputs = old.nativeBuildInputs ++ [ nixpkgs.python3Packages.pythonRelaxDepsHook ];
+            # pythonRelaxDeps = [ "protobuf" ];
+          # });
           scikit-image = pythonPackages.scikitimage;
         };
       overlay_webui = nixpkgs: pythonPackages:
@@ -162,22 +162,14 @@
         };
       overlay_amd = nixpkgs: pythonPackages:
         rec {
-          torch-bin = pythonPackages.torch-bin.overrideAttrs (old: {
-            src = nixpkgs.fetchurl {
-              name = "torch-1.12.1+rocm5.1.1-cp310-cp310-linux_x86_64.whl";
-              url = "https://download.pytorch.org/whl/rocm5.1.1/torch-1.12.1%2Brocm5.1.1-cp310-cp310-linux_x86_64.whl";
-              hash = "sha256-kNShDx88BZjRQhWgnsaJAT8hXnStVMU1ugPNMEJcgnA=";
-            };
+          huggingface-hub = pythonPackages.huggingface-hub.overrideAttrs(_: {
+            src = nixpkgs.fetchFromGitHub {
+              owner = "huggingface";
+              repo = "huggingface_hub";
+              rev = "refs/tags/v0.11.0";
+              hash = "sha256-d+X4hGt4K6xmRFw8mevKpZ6RDv+U1PJ8WbmdKGDbVNs=";
+              };
           });
-          torchvision-bin = pythonPackages.torchvision-bin.overrideAttrs (old: {
-            src = nixpkgs.fetchurl {
-              name = "torchvision-0.13.1+rocm5.1.1-cp310-cp310-linux_x86_64.whl";
-              url = "https://download.pytorch.org/whl/rocm5.1.1/torchvision-0.13.1%2Brocm5.1.1-cp310-cp310-linux_x86_64.whl";
-              hash = "sha256-mYk4+XNXU6rjpgWfKUDq+5fH/HNPQ5wkEtAgJUDN/Jg=";
-            };
-          });
-          torch = torch-bin;
-          torchvision = torchvision-bin;
           #overriding because of https://github.com/NixOS/nixpkgs/issues/196653
           opencv4 = pythonPackages.opencv4.override { openblas = nixpkgs.blas; };
         };
