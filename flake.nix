@@ -2,7 +2,6 @@
   description = "A very basic flake";
 
   inputs = {
-    nixlib.url = "github:nix-community/nixpkgs.lib";
     nixpkgs = {
       url = "github:NixOS/nixpkgs/nixos-unstable"; # ?rev=fd54651f5ffb4a36e8463e0c327a78442b26cbe7";
     };
@@ -11,11 +10,11 @@
       flake = false;
     };
   };
-  outputs = { self, nixpkgs, nixlib, stable-diffusion-repo }@inputs:
+  outputs = { self, nixpkgs, stable-diffusion-repo }@inputs:
     let
-      nixlib = inputs.nixlib.outputs.lib;
+      inherit (inputs.nixpkgs) lib;
       supportedSystems = [ "x86_64-linux" ];
-      forAll = nixlib.genAttrs supportedSystems;
+      forAll = lib.genAttrs supportedSystems;
       requirementsFor = { pkgs, webui ? false }: with pkgs; with pkgs.python3.pkgs; [
         python3
 
@@ -48,7 +47,7 @@
         realesrgan
         pillow
       ]
-      ++ nixlib.optional (!webui) [
+      ++ lib.optional (!webui) [
         send2trash
         flask
         flask-socketio
@@ -59,7 +58,7 @@
         clipseg
         getpass-asterisk
       ]
-      ++ nixlib.optional webui [
+      ++ lib.optional webui [
         addict
         future
         lmdb
@@ -223,7 +222,7 @@
                 config.allowUnfree = nvidia; #CUDA is unfree.
                 overlays = [
                   (final: prev:
-                    let optional = nixlib.optionalAttrs; in
+                    let optional = lib.optionalAttrs; in
                     {
                       python3 = prev.python3.override {
                         packageOverrides =
