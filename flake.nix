@@ -9,6 +9,10 @@
       url = "github:CompVis/stable-diffusion?rev=69ae4b35e0a0f6ee1af8bb9a5d0016ccb27e36dc";
       flake = false;
     };
+    flake-parts = {
+      url = "github:hercules-ci/flake-parts";
+      inputs.nixpkgs-lib.follows = "nixpkgs";
+    };
   };
   outputs = { self, nixpkgs, stable-diffusion-repo }@inputs:
     let
